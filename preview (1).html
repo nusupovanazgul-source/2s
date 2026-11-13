@@ -1,0 +1,416 @@
+
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Математика әлемі</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #dff3ff, #f2e5ff);
+    color: #263653;
+}
+
+header {
+    text-align: center;
+    padding: 30px 15px;
+    color: white;
+    background: linear-gradient(120deg, #3978d6, #805ad5);
+}
+
+header h1 {
+    font-size: 32px;
+    margin: 10px;
+}
+
+header p {
+    font-size: 17px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.panel {
+    background: white;
+    padding: 22px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px #00000012;
+}
+
+input {
+    padding: 12px;
+    border: 2px solid #d5e0ef;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+#studentName {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.info {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.info span {
+    background: #eaf2ff;
+    color: #285da8;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.task {
+    background: white;
+    padding: 20px;
+    border-radius: 18px;
+    border: 2px solid #e0e8f4;
+    text-align: center;
+}
+
+.task h3 {
+    color: #3978d6;
+}
+
+.equation {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #263d68;
+}
+
+.task input {
+    width: 120px;
+    text-align: center;
+}
+
+.feedback {
+    margin-top: 12px;
+    font-weight: bold;
+    min-height: 22px;
+}
+
+.correct {
+    color: green;
+}
+
+.wrong {
+    color: red;
+}
+
+button {
+    border: none;
+    padding: 15px 25px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#check {
+    width: 100%;
+    background: #16a36e;
+    color: white;
+    margin-top: 20px;
+}
+
+#retry {
+    background: #3978d6;
+    color: white;
+    width: 100%;
+    margin-top: 15px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#result {
+    display: none;
+    text-align: center;
+    background: #effff5;
+}
+
+.score {
+    font-size: 48px;
+    color: #168653;
+    font-weight: bold;
+}
+
+@media(max-width:600px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 25px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div style="font-size:45px">🧮 🌈 ⭐</div>
+    <h1>МАТЕМАТИКА ӘЛЕМІ</h1>
+    <p>Екі таңбалы сандарды қосу және азайту</p>
+    <p>2-сыныпқа арналған интерактивті тапсырмалар</p>
+</header>
+
+<div class="container">
+
+    <div class="panel">
+        <h3>👧 Оқушының аты-жөні:</h3>
+        <input
+            type="text"
+            id="studentName"
+            placeholder="Атыңды және тегіңді жаз..."
+        >
+
+        <p>
+            Әр есепті мұқият шығар.
+            Жауабыңды бос орынға енгіз.
+        </p>
+
+        <div class="info">
+            <span>📝 10 тапсырма</span>
+            <span>🏅 Әр есеп – 1 балл</span>
+            <span>🎯 Барлығы – 10 балл</span>
+        </div>
+    </div>
+
+    <div class="grid" id="tasks"></div>
+
+    <div class="panel">
+        <button id="check" onclick="checkAnswers()">
+            ✅ Жауаптарды тексеру
+        </button>
+
+        <div id="result" class="panel">
+            <h2>🏆 Сенің нәтижең!</h2>
+
+            <div class="score" id="score"></div>
+
+            <h3 id="message"></h3>
+
+            <p id="studentResult"></p>
+
+            <p id="detail"></p>
+
+            <button id="retry" onclick="restart()">
+                🔄 Қайта орындау
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<footer style="text-align:center;padding:20px">
+    🌟 Математика – қызықты әрі оңай!
+</footer>
+
+<script>
+
+// Тапсырмалар мен жауаптар
+const questions = [
+    {a:24, op:"+", b:13, answer:37},
+    {a:35, op:"+", b:22, answer:57},
+    {a:46, op:"+", b:18, answer:64},
+    {a:27, op:"+", b:35, answer:62},
+    {a:53, op:"+", b:16, answer:69},
+
+    {a:48, op:"−", b:15, answer:33},
+    {a:67, op:"−", b:24, answer:43},
+    {a:82, op:"−", b:36, answer:46},
+    {a:75, op:"−", b:28, answer:47},
+    {a:91, op:"−", b:43, answer:48}
+];
+
+// Тапсырмаларды экранға шығару
+const taskBox = document.getElementById("tasks");
+
+questions.forEach((q, i) => {
+
+    const card = document.createElement("div");
+
+    card.className = "task";
+
+    card.innerHTML = `
+        <h3>${i+1}-тапсырма ⭐</h3>
+
+        <div class="equation">
+            ${q.a} ${q.op} ${q.b} = ?
+        </div>
+
+        <p>Жауабың:</p>
+
+        <input
+            type="number"
+            id="ans${i}"
+            placeholder="?"
+        >
+
+        <div class="feedback" id="feedback${i}">
+        </div>
+    `;
+
+    taskBox.appendChild(card);
+
+});
+
+// Жауаптарды тексеру
+let checked = false;
+
+function checkAnswers() {
+
+    if (checked) return;
+
+    const name =
+        document.getElementById("studentName").value.trim();
+
+    if (name === "") {
+        alert("Алдымен аты-жөніңді жаз!");
+        return;
+    }
+
+    let score = 0;
+    let answered = 0;
+
+    questions.forEach((q, i) => {
+
+        const field = document.getElementById("ans" + i);
+
+        const feedback =
+            document.getElementById("feedback" + i);
+
+        const value = field.value.trim();
+
+        field.disabled = true;
+
+        if (value !== "") {
+            answered++;
+        }
+
+        if (value !== "" && Number(value) === q.answer) {
+
+            score++;
+
+            feedback.innerHTML = "✓ Дұрыс! +1 балл";
+            feedback.className = "feedback correct";
+
+        } else {
+
+            feedback.innerHTML =
+                `✗ Дұрыс жауап: ${q.answer}`;
+
+            feedback.className = "feedback wrong";
+        }
+
+    });
+
+    checked = true;
+
+    document.getElementById("score").innerHTML =
+        score + " / 10";
+
+    document.getElementById("studentResult").innerHTML =
+        "Оқушы: " + name;
+
+    document.getElementById("detail").innerHTML =
+        `Дұрыс жауап: ${score} | Қате жауап: ${10-score} | Жауап берілгені: ${answered}`;
+
+    let message = "";
+
+    if (score >= 9) {
+        message = "🌟 Тамаша! Сен нағыз математиксің!";
+    }
+    else if (score >= 7) {
+        message = "👏 Жарайсың! Өте жақсы нәтиже!";
+    }
+    else if (score >= 5) {
+        message = "😊 Жақсы! Тағы да жаттығып көр!";
+    }
+    else {
+        message = "💪 Қайта дайындал! Сенің қолыңнан келеді!";
+    }
+
+    document.getElementById("message").innerHTML =
+        message;
+
+    document.getElementById("result").style.display =
+        "block";
+
+    document.getElementById("check").disabled = true;
+
+    document.getElementById("result").scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+// Қайта орындау
+function restart() {
+
+    questions.forEach((q, i) => {
+
+        const field = document.getElementById("ans" + i);
+
+        field.value = "";
+        field.disabled = false;
+
+        const feedback =
+            document.getElementById("feedback" + i);
+
+        feedback.innerHTML = "";
+        feedback.className = "feedback";
+
+    });
+
+    document.getElementById("studentName").value = "";
+
+    document.getElementById("result").style.display =
+        "none";
+
+    document.getElementById("check").disabled = false;
+
+    checked = false;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+</script>
+
+</body>
+</html>
